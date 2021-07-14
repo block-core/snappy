@@ -281,60 +281,6 @@ if(SNAPPY_BUILD_TESTS OR SNAPPY_BUILD_BENCHMARKS)
   )
 endif(SNAPPY_BUILD_TESTS OR SNAPPY_BUILD_BENCHMARKS)
 
-if(SNAPPY_BUILD_TESTS)
-  enable_testing()
-
-  # Prevent overriding the parent project's compiler/linker settings on Windows.
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-  set(install_gtest OFF)
-  set(install_gmock OFF)
-  set(build_gmock ON)
-
-  # This project is tested using GoogleTest.
-  add_subdirectory("third_party/googletest")
-
-  # GoogleTest triggers a missing field initializers warning.
-  if(SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS)
-    set_property(TARGET gtest
-        APPEND PROPERTY COMPILE_OPTIONS -Wno-missing-field-initializers)
-    set_property(TARGET gmock
-        APPEND PROPERTY COMPILE_OPTIONS -Wno-missing-field-initializers)
-  endif(SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS)
-
-  add_executable(snappy_unittest "")
-  target_sources(snappy_unittest
-    PRIVATE
-      "snappy_unittest.cc"
-  )
-  target_link_libraries(snappy_unittest snappy_test_support gmock_main gtest)
-
-  add_test(
-    NAME snappy_unittest
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-    COMMAND "${PROJECT_BINARY_DIR}/snappy_unittest")
-
-  add_executable(snappy_test_tool "")
-  target_sources(snappy_test_tool
-    PRIVATE
-      "snappy_test_tool.cc"
-  )
-  target_link_libraries(snappy_test_tool snappy_test_support)
-endif(SNAPPY_BUILD_TESTS)
-
-if(SNAPPY_BUILD_BENCHMARKS)
-  add_executable(snappy_benchmark "")
-  target_sources(snappy_benchmark
-    PRIVATE
-      "snappy_benchmark.cc"
-  )
-  target_link_libraries(snappy_benchmark snappy_test_support benchmark_main)
-
-  # This project uses Google benchmark for benchmarking.
-  set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-  set(BENCHMARK_ENABLE_EXCEPTIONS OFF CACHE BOOL "" FORCE)
-  add_subdirectory("third_party/benchmark")
-endif(SNAPPY_BUILD_BENCHMARKS)
-
 if(SNAPPY_FUZZING_BUILD)
   add_executable(snappy_compress_fuzzer "")
   target_sources(snappy_compress_fuzzer
